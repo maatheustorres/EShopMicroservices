@@ -1,4 +1,5 @@
-﻿using Basket.API.Models;
+﻿using Basket.API.Data;
+using Basket.API.Models;
 using BuildingBlocks.CQRS;
 using FluentValidation;
 
@@ -16,11 +17,13 @@ public class StoreBasketCommandValidator : AbstractValidator<StoreBasketCommand>
     }
 }
 
-public class StoreBasketCommandHandler : ICommandHandler<StoreBasketCommand, StoreBasketResult>
+public class StoreBasketCommandHandler(IBasketRepository basketRepository) : ICommandHandler<StoreBasketCommand, StoreBasketResult>
 {
     public async Task<StoreBasketResult> Handle(StoreBasketCommand request, CancellationToken cancellationToken)
     {
         ShoppingCart shoppingCart = request.ShoppingCart;
+
+        await basketRepository.StoreBasket(request.ShoppingCart, cancellationToken);
 
         return new StoreBasketResult(request.ShoppingCart.Username);
     }
